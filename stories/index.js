@@ -13,6 +13,7 @@ import InterviewerListItem from "../src/components/InterviewerListItem";
 import InterviewerList from "../src/components/InterviewerList";
 
 import Appointment from "../src/components/Appointment";
+import Header from "../src/components/Appointment/Header";
 
 storiesOf("Button", module)
   .addParameters({
@@ -137,6 +138,11 @@ storiesOf("InterviewerList", module)
   .add("Appointment", () => <Appointment />)
   .add("Appointment With Time", () => (
     <Appointment 
+      time="12pm"
+    />
+  ))
+  .add("Header", () => (
+    <Header 
       time="12pm"
     />
   ));
