@@ -1,7 +1,7 @@
 import React from "react";
-import './InterviewListItem.scss';
+import './InterviewerListItem.scss';
 
-export default function InterviewListItem(props) {
+export default function InterviewerListItem(props) {
   return (
     <li className="interviewers__item">
       <img
