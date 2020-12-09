@@ -1,10 +1,10 @@
 function getAppointmentsForDay (state, day) {
+  let apptArray = [];
   const selectedDay = state.days.filter(d => d.name === day);
   if (!state.days.length || !selectedDay.length) {
-    return [];
+    return apptArray;
   }
   const appointments = selectedDay[0].appointments;
-  let apptArray = [];
   for (let appt of appointments) {
     apptArray.push(state.appointments[appt])
   }
