@@ -78,7 +78,7 @@ export default function Application(props) {
     appointments: {}
   });
 
-  const dailyAppointments = getAppointmentsForDay(state, day);
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
 
   //seperating actions to update certain parts of the state
   //spread will take all the existing keys in state - keys declared will overwrite old ones
@@ -105,7 +105,7 @@ export default function Application(props) {
       }),
     ]).then(([days, appointments, interviewers]) => {
       setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data})
-    })
+    }).catch(error => console.log(error));
   }, []);
 
   return (
