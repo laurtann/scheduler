@@ -9,8 +9,6 @@ import Appointment from 'components/Appointment'
 
 import { getAppointmentsForDay } from '../helpers/selectors'
 
-
-
 // const appointments = [
 //   {
 //     id: 1,
@@ -67,11 +65,9 @@ import { getAppointmentsForDay } from '../helpers/selectors'
 
 // ];
 
-
-
 export default function Application(props) {
 
-  //make a state obj 
+  //make a state obj
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -87,7 +83,7 @@ export default function Application(props) {
 
   //creating setDays action 4 axios req
   //remove dependency on state w function
-  //const setDays = days => setState({ ...state, days });
+  // const setDays = days => setState({ ...state, days });
 
   useEffect(() => {
     Promise.all([
@@ -140,7 +136,7 @@ export default function Application(props) {
         }
         <Appointment key="last" time="5pm" />
       </section>
-    </main> 
+    </main>
   );
 }
 
