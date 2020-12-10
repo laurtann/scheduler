@@ -9,7 +9,11 @@ function getAppointmentsForDay (state, day) {
     apptArray.push(state.appointments[appt])
   }
   return apptArray;
-} 
+}
 
-module.exports = { getAppointmentsForDay };
+function getInterview (state, interview) {
+
+}
+
+module.exports = { getAppointmentsForDay, getInterview };
 

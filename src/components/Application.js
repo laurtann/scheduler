@@ -71,8 +71,12 @@ export default function Application(props) {
   const [state, setState] = useState({
     day: "Monday",
     days: [],
-    appointments: {}
+    appointments: {},
+    interviewers: {}
   });
+
+  //this works
+  console.log("These are interviewers, ", state.interviewers)
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
 
