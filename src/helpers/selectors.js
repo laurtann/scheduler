@@ -12,8 +12,22 @@ function getAppointmentsForDay (state, day) {
 }
 
 function getInterview (state, interview) {
+  let interviewObj = {};
 
-}
+  if (!interview) {
+    return null;
+  }
+
+  let interviewerId = interview.interviewer
+
+  if (state.interviewers[interviewerId]) {
+    interviewObj.student = interview.student;
+    interviewObj.interviewer = state.interviewers[interviewerId]
+    return interviewObj;
+  }
+  return null;
+};
+
 
 module.exports = { getAppointmentsForDay, getInterview };
 
