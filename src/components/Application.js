@@ -15,6 +15,7 @@ export default function Application(props) {
     interviewers: {}
   });
 
+  // book interview using appt id and interview obj
   function bookInterview(id, interview) {
     console.log("This is in bookinterview id, interview ", id, interview);
   }
