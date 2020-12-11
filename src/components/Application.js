@@ -3,90 +3,20 @@ import axios from 'axios';
 import DayList from './DayList';
 import "components/Application.scss";
 import Appointment from 'components/Appointment'
+import useApplicationData from 'hooks/useApplicationData';
 import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../helpers/selectors'
 
 export default function Application(props) {
-
-  //state object
-  const [state, setState] = useState({
-    day: "Monday",
-    days: [],
-    appointments: {},
-    interviewers: {}
-  });
-
-  function deleteInterview(id, interview) {
-    return axios({
-      method: "DELETE",
-      url:`/api/appointments/${id}`
-    })
-    .then(response =>
-      setState({
-        ...state,
-        interview: null
-      })
-    )
-  }
-
-  // book interview using appt id and interview obj
-  function bookInterview(id, interview) {
-    return axios({
-      method: "PUT",
-      url: `/api/appointments/${id}`,
-      data: { interview }
-    })
-      .then(response => {
-        // appt state obj
-        const appointment = {
-          ...state.appointments[id],
-          interview: { ...interview }
-        }
-        // keep moving up and can now make appts state obj
-        const appointments = {
-          ...state.appointments,
-          [id]: appointment
-        };
-        // set state on new state obj
-        setState({
-          ...state,
-          appointments,
-          interview: response.data
-        });
-      })
-      .catch(error => console.log(error));
-  }
-
-  //this works
-  // console.log("These are interviewers, ", state.interviewers);
-  // console.log("These are appts, ", state.appointments);
-  // console.log("These are days, ", state.days);
+  const {
+    state,
+    setDay,
+    bookInterview,
+    deleteInterview
+  } = useApplicationData();
 
   // helpers
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
-
-  // seperate action from state
-  const setDay = day => setState({ ...state, day });
-
-  // request all APIs
-  useEffect(() => {
-    Promise.all([
-      axios({
-        method: "GET",
-        url: `/api/days`
-      }),
-      axios({
-        method: "GET",
-        url: `/api/appointments`
-      }),
-      axios({
-        method: "GET",
-        url: `/api/interviewers`
-      }),
-    ]).then(([days, appointments, interviewers]) => {
-      setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data })
-    }).catch(error => console.log(error));
-  }, []);
 
   return (
     <main className="layout">
