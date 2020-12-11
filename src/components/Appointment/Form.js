@@ -5,7 +5,7 @@ import InterviewerList from "components/InterviewerList"
 export default function Form(props) {
   const [name, setName] = useState(props.name || "");
   const [interviewer, setInterviewer] = useState(props.interviewer || null);
-  
+
   const reset = () => {
     setName("");
     setInterviewer(null);
@@ -27,14 +27,11 @@ export default function Form(props) {
             type="text"
             value={name}
             placeholder="Enter Student Name"
-            /*
-              This must be a controlled component
-            */
           />
         </form>
-        <InterviewerList 
+        <InterviewerList
           interviewers={props.interviewers}
-          interviewer={interviewer} 
+          interviewer={interviewer}
           setInterviewer={(event) => setInterviewer(event)}
         />
       </section>

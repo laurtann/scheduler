@@ -7,7 +7,7 @@ import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../h
 
 export default function Application(props) {
 
-  //make a state obj
+  //state object
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -15,24 +15,23 @@ export default function Application(props) {
     interviewers: {}
   });
 
+  function bookInterview(id, interview) {
+    console.log("This is in bookinterview id, interview ", id, interview);
+  }
+
   //this works
   // console.log("These are interviewers, ", state.interviewers);
   // console.log("These are appts, ", state.appointments);
   // console.log("These are days, ", state.days);
 
-
+  // helpers
   const dailyAppointments = getAppointmentsForDay(state, state.day);
-  const dailyInterviewers = getInterviewersForDay(state, state.day)
+  const dailyInterviewers = getInterviewersForDay(state, state.day);
 
-  //seperating actions to update certain parts of the state
-  //spread will take all the existing keys in state - keys declared will overwrite old ones
-  //So we're updating state w new day
+  // seperate action from state
   const setDay = day => setState({ ...state, day });
 
-  //creating setDays action 4 axios req
-  //remove dependency on state w function
-  // const setDays = days => setState({ ...state, days });
-
+  // request all APIs
   useEffect(() => {
     Promise.all([
       axios({
@@ -78,6 +77,7 @@ export default function Application(props) {
         {
           dailyAppointments.map(appointment => {
             const interview = getInterview(state, appointment.interview);
+            const newInterviewBooking = bookInterview(appointment.id, interview);
             return (
               <Appointment
                 key={appointment.id}
@@ -85,6 +85,7 @@ export default function Application(props) {
                 time={appointment.time}
                 interview={interview}
                 interviewers={dailyInterviewers}
+                bookInterview={newInterviewBooking}
               />
             );
           })
