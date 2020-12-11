@@ -30,7 +30,7 @@ function getInterviewersForDay (state, day){
     return [];
   }
   const interviewers = dayFound.interviewers.map(interviewerId => state.interviewers[interviewerId]);
-  console.log(interviewers);
+  // console.log(interviewers);
   return interviewers;
 }
 
