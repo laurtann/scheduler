@@ -3,63 +3,7 @@ import axios from 'axios';
 import DayList from './DayList';
 import "components/Application.scss";
 import Appointment from 'components/Appointment'
-import { getAppointmentsForDay, getInterview } from '../helpers/selectors'
-
-// const appointments = [
-//   {
-//     id: 1,
-//     time: "12pm",
-//   },
-//   {
-//     id: 2,
-//     time: "1pm",
-//     interview: {
-//       student: "Lydia Miller-Jones",
-//       interviewer: {
-//         id: 1,
-//         name: "Sylvia Palmer",
-//         avatar: "https://i.imgur.com/LpaY82x.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 3,
-//     time: "2pm",
-//     interview: {
-//       student: "Maximillian Barcelona",
-//       interviewer: {
-//         id: 2,
-//         name: "Tori Malcolm",
-//         avatar: "https://i.imgur.com/Nmx0Qxo.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 4,
-//     time: "3pm",
-//     interview: {
-//       student: "Bart Michaels",
-//       interviewer: {
-//         id: 3,
-//         name: "Mildred Nazir",
-//         avatar: "https://i.imgur.com/T2WwVfS.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 5,
-//     time: "4pm",
-//     interview: {
-//       student: "Natalie Wilde",
-//       interviewer: {
-//         id: 4,
-//         name: "Cohana Roy",
-//         avatar: "https://i.imgur.com/FK8V841.jpg",
-//       }
-//     }
-//   },
-
-// ];
+import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../helpers/selectors'
 
 export default function Application(props) {
 
@@ -72,12 +16,13 @@ export default function Application(props) {
   });
 
   //this works
-  console.log("These are interviewers, ", state.interviewers);
-  console.log("These are appts, ", state.appointments);
-  console.log("These are days, ", state.days);
+  // console.log("These are interviewers, ", state.interviewers);
+  // console.log("These are appts, ", state.appointments);
+  // console.log("These are days, ", state.days);
 
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
+  const dailyInterviewers = getInterviewersForDay(state, state.day)
 
   //seperating actions to update certain parts of the state
   //spread will take all the existing keys in state - keys declared will overwrite old ones
@@ -139,6 +84,7 @@ export default function Application(props) {
                 id={appointment.id}
                 time={appointment.time}
                 interview={interview}
+                interviewers={dailyInterviewers}
               />
             );
           })

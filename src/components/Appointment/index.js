@@ -5,17 +5,19 @@ import Show from './Show';
 import Empty from './Empty';
 import Form from './Form';
 import useVisualMode from '../../../src/hooks/useVisualMode';
+// import getInterviewersForDay from '../../../src/helpers/selectors';
 // import classNames from 'classnames';
 
-const interviewers = [];
+
 const EMPTY = "EMPTY";
 const SHOW = "SHOW";
 const CREATE = "CREATE";
-const BACK = "BACK";
+// const BACK = "BACK";
 export default function Appointment(props) {
   const { mode, transition, back } = useVisualMode(
     props.interview ? SHOW : EMPTY
   );
+
   return (
     <article className="appointment">
       <Header
@@ -30,9 +32,9 @@ export default function Appointment(props) {
       )}
       {mode === CREATE && (
         <Form
-          interviewers={interviewers}
+          interviewers={props.interviewers}
           // onSave={props.onSave}
-          onCancel={() => transition(BACK)}
+          onCancel={back}
         />
       )}
       {/* {props.interview ? <Show student={props.interview.student} interviewer={props.interview.interviewer}/> : <Empty />} */}
