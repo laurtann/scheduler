@@ -15,12 +15,13 @@ export default function Appointment(props) {
     props.interview ? SHOW : EMPTY
   );
 
-  // save
+  //save func
   function save(name, interviewer) {
     const interview = {
       student: name,
       interviewer
     };
+    props.bookInterview(props.id, interview);
   }
 
   return (

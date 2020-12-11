@@ -78,7 +78,6 @@ export default function Application(props) {
         {
           dailyAppointments.map(appointment => {
             const interview = getInterview(state, appointment.interview);
-            const newInterviewBooking = bookInterview(appointment.id, interview);
             return (
               <Appointment
                 key={appointment.id}
@@ -86,7 +85,7 @@ export default function Application(props) {
                 time={appointment.time}
                 interview={interview}
                 interviewers={dailyInterviewers}
-                bookInterview={newInterviewBooking}
+                bookInterview={bookInterview}
               />
             );
           })
