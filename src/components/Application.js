@@ -17,7 +17,23 @@ export default function Application(props) {
 
   // book interview using appt id and interview obj
   function bookInterview(id, interview) {
-    console.log("This is in bookinterview id, interview ", id, interview);
+    // appt state obj
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview }
+    };
+
+    // keep moving up and can now make appts state obj
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+
+    // set state on new state obj
+    setState({
+      ...state,
+      appointments
+    });
   }
 
   //this works
