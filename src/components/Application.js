@@ -15,6 +15,19 @@ export default function Application(props) {
     interviewers: {}
   });
 
+  function deleteInterview(id, interview) {
+    return axios({
+      method: "DELETE",
+      url:`/api/appointments/${id}`
+    })
+    .then(response =>
+      setState({
+        ...state,
+        interview: null
+      })
+    )
+  }
+
   // book interview using appt id and interview obj
   function bookInterview(id, interview) {
     return axios({
@@ -109,6 +122,7 @@ export default function Application(props) {
                 interview={interview}
                 interviewers={dailyInterviewers}
                 bookInterview={bookInterview}
+                deleteInterview={deleteInterview}
               />
             );
           })
