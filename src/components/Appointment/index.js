@@ -25,13 +25,13 @@ export default function Appointment(props) {
   );
 
   //save appt to db
-  function save(name, interviewer) {
+  function save(name, interviewer, changeSpots) {
     const interview = {
       student: name,
       interviewer
     };
     transition(SAVING);
-    props.bookInterview(props.id, interview)
+    props.bookInterview(props.id, interview, changeSpots)
     .then(() => transition(SHOW))
     .catch(error => transition(ERROR_SAVE, true));
   }
@@ -74,6 +74,7 @@ export default function Appointment(props) {
           interviewers={props.interviewers}
           onSave={save}
           onCancel={back}
+          changeSpots={true}
         />
       )}
       {mode === EDIT && (

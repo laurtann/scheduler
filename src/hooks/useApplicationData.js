@@ -32,12 +32,14 @@ export default function useApplicationData() {
 
   const setDay = day => setState({ ...state, day });
 
-  function bookInterview(id, interview) {
+  function bookInterview(id, interview, changeSpots) {
 
     //update spots
-    for (let day of [...state.days]) {
-      if (day.appointments.includes(id)) {
-        day.spots -= 1;
+    if (changeSpots) {
+      for (let day of [...state.days]) {
+        if (day.appointments.includes(id)) {
+          day.spots -= 1;
+        }
       }
     }
 
