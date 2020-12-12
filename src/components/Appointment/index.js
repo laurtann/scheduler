@@ -50,7 +50,6 @@ export default function Appointment(props) {
     transition(CONFIRM);
   }
 
-  //edit appointment info
   function editAppointment() {
     transition(EDIT);
   }
@@ -63,7 +62,6 @@ export default function Appointment(props) {
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
       {mode === SHOW && (
         <Show
-          // these are coming from appointment props
           student={props.interview.student}
           interviewer={props.interview.interviewer}
           onDelete={pressDelete}
