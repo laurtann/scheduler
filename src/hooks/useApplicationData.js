@@ -66,7 +66,6 @@ export default function useApplicationData() {
           interview: response.data
         });
       })
-      .catch(error => console.log(error));
   }
 
   function deleteInterview(id, interview) {
@@ -88,7 +87,6 @@ export default function useApplicationData() {
           interview: null
         })
       )
-      .catch(error => console.log(error));
   }
 
   return { state, setDay, bookInterview, deleteInterview }
