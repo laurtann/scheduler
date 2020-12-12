@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 
 export default function useApplicationData() {
@@ -7,7 +7,7 @@ export default function useApplicationData() {
     day: "Monday",
     days: [],
     appointments: {},
-    interviewers: {}
+    interviewers: {},
   });
 
   // request all APIs
@@ -26,13 +26,23 @@ export default function useApplicationData() {
         url: `/api/interviewers`
       }),
     ]).then(([days, appointments, interviewers]) => {
-      setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data })
+      setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data });
+      // console.log(appointments.data);
+      console.log(days.data, appointments.data, interviewers.data);
     }).catch(error => console.log(error));
   }, []);
+
 
   const setDay = day => setState({ ...state, day });
 
   function bookInterview(id, interview) {
+
+    for (let day of [...state.days]) {
+      if (day.appointments.includes(id)) {
+        day.spots -= 1;
+      }
+    }
+
     return axios({
       method: "PUT",
       url: `/api/appointments/${id}`,
@@ -60,17 +70,25 @@ export default function useApplicationData() {
   }
 
   function deleteInterview(id, interview) {
+
+    for (let day of [...state.days]) {
+      if (day.appointments.includes(id)) {
+        day.spots += 1
+      }
+    }
+
     return axios({
       method: "DELETE",
-      url:`/api/appointments/${id}`
+      url: `/api/appointments/${id}`
     })
-    .then(response =>
-      setState({
-        ...state,
-        interview: null
-      })
-    )
+      .then(response =>
+        setState({
+          ...state,
+          interview: null
+        })
+      )
+      .catch(error => console.log(error));
   }
 
-  return{ state, setDay, bookInterview, deleteInterview }
+  return { state, setDay, bookInterview, deleteInterview }
 }
