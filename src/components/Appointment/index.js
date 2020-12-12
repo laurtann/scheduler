@@ -25,6 +25,7 @@ export default function Appointment(props) {
   );
 
   //save appt to db
+  //only change spots in create mode
   function save(name, interviewer, changeSpots) {
     const interview = {
       student: name,

@@ -1,14 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import axios from 'axios';
 
 export default function useApplicationData() {
-  //state object
-  const [state, setState] = useState({
+  const SET_DAY = "SET_DAY";
+  const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
+  const SET_INTERVIEW = "SET_INTERVIEW";
+
+  const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
     appointments: {},
     interviewers: {},
   });
+
+  function reducer(state, action) {
+    if (action.type === SET_DAY) {
+      return {...state, day: action.day}
+    }
+    if (action.type === SET_APPLICATION_DATA) {
+      return {...state, days: action.days, appointments: action.appointments, interviewers: action.interviewers}
+    }
+    if (action.type === SET_INTERVIEW) {
+      return {...state, appointments: action.appointments, interview: action.interview }
+    }
+    return state;
+  }
 
   // request all APIs
   useEffect(() => {
@@ -26,11 +42,15 @@ export default function useApplicationData() {
         url: `/api/interviewers`
       }),
     ]).then(([days, appointments, interviewers]) => {
-      setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data });
+      dispatch({
+        type: SET_APPLICATION_DATA,
+        days: days.data,
+        appointments: appointments.data,
+        interviewers: interviewers.data });
     }).catch(error => console.log(error));
   }, []);
 
-  const setDay = day => setState({ ...state, day });
+  const setDay = day => dispatch({ type: SET_DAY, day });
 
   function bookInterview(id, interview, changeSpots) {
 
@@ -60,8 +80,7 @@ export default function useApplicationData() {
           [id]: appointment
         };
         // set state on new state obj
-        setState({
-          ...state,
+        dispatch({ type: SET_INTERVIEW,
           appointments,
           interview: response.data
         });
@@ -69,6 +88,8 @@ export default function useApplicationData() {
   }
 
   function deleteInterview(id, interview) {
+    // add in to satisfy reducer
+    const appointments = state.appointments;
 
     // update spots
     for (let day of [...state.days]) {
@@ -82,9 +103,10 @@ export default function useApplicationData() {
       url: `/api/appointments/${id}`
     })
       .then(response =>
-        setState({
-          ...state,
-          interview: null
+        dispatch({
+          type: SET_INTERVIEW,
+          interview: null,
+          appointments
         })
       )
   }
