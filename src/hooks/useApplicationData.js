@@ -27,16 +27,14 @@ export default function useApplicationData() {
       }),
     ]).then(([days, appointments, interviewers]) => {
       setState({ ...state, days: days.data, appointments: appointments.data, interviewers: interviewers.data });
-      // console.log(appointments.data);
-      console.log(days.data, appointments.data, interviewers.data);
     }).catch(error => console.log(error));
   }, []);
-
 
   const setDay = day => setState({ ...state, day });
 
   function bookInterview(id, interview) {
 
+    //update spots
     for (let day of [...state.days]) {
       if (day.appointments.includes(id)) {
         day.spots -= 1;
@@ -71,11 +69,12 @@ export default function useApplicationData() {
 
   function deleteInterview(id, interview) {
 
+    // update spots
     for (let day of [...state.days]) {
       if (day.appointments.includes(id)) {
         day.spots += 1
       }
-    }
+    };
 
     return axios({
       method: "DELETE",

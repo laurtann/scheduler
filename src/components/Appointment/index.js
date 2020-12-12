@@ -51,7 +51,7 @@ export default function Appointment(props) {
 
   //edit appointment info
   function editAppointment() {
-    transition(EDIT)
+    transition(EDIT);
   }
 
   return (
@@ -80,7 +80,7 @@ export default function Appointment(props) {
         <Form
           interviewers={props.interviewers}
           onSave={save}
-          onCancel={back}s
+          onCancel={back}
           interviewer={props.interview.interviewer.id}
           name={props.interview.student}
         />
