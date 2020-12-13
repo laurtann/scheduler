@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './styles.scss';
 import Header from './Header';
 import Show from './Show';
@@ -45,14 +45,16 @@ export default function Appointment(props) {
     .catch(error => transition(ERROR_DELETE, true));
   }
 
-  // helper to transition to confirm deletion when form delete btn pressed
-  function pressDelete() {
-    transition(CONFIRM);
-  }
+  // useEffect(() => {
+  //   if (props.interview && mode === EMPTY) {
+  //     transition(SHOW);
+  //     console.log("IN UF", props.interview);
+  //   }
+  //   if (props.interview === null && mode === SHOW) {
+  //     transition(EMPTY);
 
-  function editAppointment() {
-    transition(EDIT);
-  }
+  //   }
+  // }, [props.interview, transition, mode]);
 
   return (
     <article className="appointment">
@@ -64,8 +66,8 @@ export default function Appointment(props) {
         <Show
           student={props.interview.student}
           interviewer={props.interview.interviewer}
-          onDelete={pressDelete}
-          onEdit={editAppointment}
+          onDelete={() => transition(CONFIRM)}
+          onEdit={() => transition(EDIT)}
         />
       )}
       {mode === CREATE && (
@@ -102,7 +104,7 @@ export default function Appointment(props) {
           message="Deleting"
         />
       )}
-      {mode === ERROR_SAVE&& (
+      {mode === ERROR_SAVE && (
         <Error
           message="Error while Saving"
           onClose={back}

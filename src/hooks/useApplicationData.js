@@ -6,6 +6,7 @@ export default function useApplicationData() {
   const SET_DAY = "SET_DAY";
   const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
   const SET_INTERVIEW = "SET_INTERVIEW";
+  const WS_INTERVIEW = "WS_INTERVIEW";
 
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
@@ -24,7 +25,12 @@ export default function useApplicationData() {
     if (action.type === SET_INTERVIEW) {
       return {...state, appointments: action.appointments, interview: action.interview }
     }
-    return state;
+    if (action.type === WS_INTERVIEW) {
+      return {...state, id: action.id, interview: action.interview }
+    }
+    throw new Error(
+      `Tried to reduce with unsupported action type: ${action.type}`
+    );
   }
 
   const setDay = day => dispatch({ type: SET_DAY, day });
@@ -45,6 +51,26 @@ export default function useApplicationData() {
       });
     })
     .catch(error => console.log(error));
+
+  //   // WEBSOCKETS IP
+  //   const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+  //   // message to server
+  //   ws.onopen = function (event) {
+  //     ws.send("ping");
+  //   };
+  //   //message from server
+  //   ws.onmessage = function (event) {
+  //     const message = JSON.parse(event.data);
+  //     console.log(message);
+
+  //     if (message.type === "SET_INTERVIEW") {
+  //       dispatch({type: WS_INTERVIEW, id: message.id, interview: message.interview})
+  //     }
+  //   }
+  //   // close connection
+  //   return function cleanup() {
+  //     ws.close();
+  //   }
   }, []);
 
   function bookInterview(id, interview, changeSpots) {
