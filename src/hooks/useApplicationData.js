@@ -55,7 +55,7 @@ export default function useApplicationData() {
           day.spots -= 1;
         }
       }
-    }
+    };
 
     // add interview info to db
     return axios({
@@ -68,7 +68,7 @@ export default function useApplicationData() {
       const appointment = {
         ...state.appointments[id],
         interview: {...interview }
-      }
+      };
 
       const appointments = {
         ...state.appointments,
