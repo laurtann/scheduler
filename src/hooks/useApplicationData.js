@@ -26,7 +26,16 @@ export default function useApplicationData() {
       return {...state, appointments: action.appointments, interview: action.interview }
     }
     if (action.type === WS_INTERVIEW) {
-      return {...state, id: action.id, interview: action.interview }
+      const appointment = {
+        ...state.appointments[action.id],
+        interview: {...action.interview }
+      };
+
+      const appointments = {
+        ...state.appointments,
+        [action.id]: appointment
+      };
+      return {...state, appointments: appointments, interview: action.interview }
     }
     throw new Error(
       `Tried to reduce with unsupported action type: ${action.type}`
@@ -43,6 +52,7 @@ export default function useApplicationData() {
       axios.get(`/api/interviewers`)
     ])
     .then(([days, appointments, interviewers]) => {
+      // console.log("DAYS", days.data, "APPTS", appointments.data, "INTS", interviewers.data);
       dispatch({
         type: SET_APPLICATION_DATA,
         days: days.data,
@@ -52,26 +62,26 @@ export default function useApplicationData() {
     })
     .catch(error => console.log(error));
 
-  //   // WEBSOCKETS IP
-  //   const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-  //   // message to server
-  //   ws.onopen = function (event) {
-  //     ws.send("ping");
-  //   };
-  //   //message from server
-  //   ws.onmessage = function (event) {
-  //     const message = JSON.parse(event.data);
-  //     console.log(message);
+    // WEBSOCKETS IP
+    const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
+    // message to server
+    ws.onopen = function (event) {
+      ws.send("ping");
+    };
+    //message from server
+    ws.onmessage = function (event) {
+      const message = JSON.parse(event.data);
+      console.log(message);
 
-  //     if (message.type === "SET_INTERVIEW") {
-  //       dispatch({type: WS_INTERVIEW, id: message.id, interview: message.interview})
-  //     }
-  //   }
-  //   // close connection
-  //   return function cleanup() {
-  //     ws.close();
-  //   }
-  }, []);
+      if (message.type === "SET_INTERVIEW") {
+        dispatch({type: WS_INTERVIEW, id: message.id, interview: message.interview})
+      }
+    }
+    // close connection
+    return function cleanup() {
+      ws.close();
+    }
+  }, [state.interview]);
 
   function bookInterview(id, interview, changeSpots) {
     //update spots
@@ -84,11 +94,7 @@ export default function useApplicationData() {
     };
 
     // add interview info to db
-    return axios({
-      method: "PUT",
-      url: `/api/appointments/${id}`,
-      data: { interview }
-    })
+    return axios.put(`/api/appointments/${id}`, { interview })
     .then(response => {
 
       const appointment = {
@@ -119,10 +125,7 @@ export default function useApplicationData() {
       }
     };
 
-    return axios({
-      method: "DELETE",
-      url: `/api/appointments/${id}`
-    })
+    return axios.delete(`/api/appointments/${id}`)
     .then(response =>
       dispatch({
         type: SET_INTERVIEW,
