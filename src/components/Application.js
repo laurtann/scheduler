@@ -1,90 +1,38 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-
 import DayList from './DayList';
-
 import "components/Application.scss";
-
 import Appointment from 'components/Appointment'
-
-import { getAppointmentsForDay } from '../helpers/selectors'
-
-// const appointments = [
-//   {
-//     id: 1,
-//     time: "12pm",
-//   },
-//   {
-//     id: 2,
-//     time: "1pm",
-//     interview: {
-//       student: "Lydia Miller-Jones",
-//       interviewer: {
-//         id: 1,
-//         name: "Sylvia Palmer",
-//         avatar: "https://i.imgur.com/LpaY82x.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 3,
-//     time: "2pm",
-//     interview: {
-//       student: "Maximillian Barcelona",
-//       interviewer: {
-//         id: 2,
-//         name: "Tori Malcolm",
-//         avatar: "https://i.imgur.com/Nmx0Qxo.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 4,
-//     time: "3pm",
-//     interview: {
-//       student: "Bart Michaels",
-//       interviewer: {
-//         id: 3,
-//         name: "Mildred Nazir",
-//         avatar: "https://i.imgur.com/T2WwVfS.png",
-//       }
-//     }
-//   },
-//   {
-//     id: 5,
-//     time: "4pm",
-//     interview: {
-//       student: "Natalie Wilde",
-//       interviewer: {
-//         id: 4,
-//         name: "Cohana Roy",
-//         avatar: "https://i.imgur.com/FK8V841.jpg",
-//       }
-//     }
-//   },
-
-// ];
+import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../helpers/selectors'
 
 export default function Application(props) {
 
-  //make a state obj
+  //state object
   const [state, setState] = useState({
     day: "Monday",
     days: [],
-    appointments: {}
+    appointments: {},
+    interviewers: {}
   });
 
-  const dailyAppointments = getAppointmentsForDay(state, state.day);
+  // book interview using appt id and interview obj
+  function bookInterview(id, interview) {
+    console.log("This is in bookinterview id, interview ", id, interview);
+  }
 
-  //seperating actions to update certain parts of the state
-  //spread will take all the existing keys in state - keys declared will overwrite old ones
-  //So we're updating state w new day
+  //this works
+  // console.log("These are interviewers, ", state.interviewers);
+  // console.log("These are appts, ", state.appointments);
+  // console.log("These are days, ", state.days);
+
+  // helpers
+  const dailyAppointments = getAppointmentsForDay(state, state.day);
+  const dailyInterviewers = getInterviewersForDay(state, state.day);
+
+  // seperate action from state
   const setDay = day => setState({ ...state, day });
 
-  //creating setDays action 4 axios req
-  //remove dependency on state w function
-  // const setDays = days => setState({ ...state, days });
-
+  // request all APIs
   useEffect(() => {
     Promise.all([
       axios({
@@ -129,9 +77,18 @@ export default function Application(props) {
       <section className="schedule">
         {
           dailyAppointments.map(appointment => {
+            const interview = getInterview(state, appointment.interview);
+            const newInterviewBooking = bookInterview(appointment.id, interview);
             return (
-              <Appointment key={appointment.id} {...appointment} />
-            )
+              <Appointment
+                key={appointment.id}
+                id={appointment.id}
+                time={appointment.time}
+                interview={interview}
+                interviewers={dailyInterviewers}
+                bookInterview={newInterviewBooking}
+              />
+            );
           })
         }
         <Appointment key="last" time="5pm" />
