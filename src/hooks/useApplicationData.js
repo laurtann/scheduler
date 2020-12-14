@@ -108,17 +108,9 @@ export default function useApplicationData() {
     return function cleanup() {
       ws.close();
     }
-  }, [state.interview]);
+  }, [state.days]);
 
   function bookInterview(id, interview, changeSpots) {
-    //update spots
-    if (changeSpots) {
-      for (let day of [...state.days]) {
-        if (day.appointments.includes(id)) {
-          day.spots -= 1;
-        }
-      }
-    };
 
     // add interview info to db
     return axios.put(`/api/appointments/${id}`, { interview })
@@ -139,17 +131,21 @@ export default function useApplicationData() {
         appointments,
         interview: response.data
       });
-    });
+    })
+    .then(() => {
+      return axios.get(`/api/days`)
+    })
+    .then(res => {
+      dispatch({
+        type: SET_APPLICATION_DATA,
+        days: res.data,
+        appointments: state.appointments,
+        interviewers: state.interviewers
+      })
+    })
   };
 
   function deleteInterview(id, interview) {
-
-    // update spots
-    for (let day of [...state.days]) {
-      if (day.appointments.includes(id)) {
-        day.spots += 1
-      }
-    };
 
     return axios.delete(`/api/appointments/${id}`)
     .then(response =>
@@ -158,6 +154,17 @@ export default function useApplicationData() {
         interview: null,
       })
     )
+    .then(() => {
+      return axios.get(`/api/days`)
+    })
+    .then(res => {
+      dispatch({
+        type: SET_APPLICATION_DATA,
+        days: res.data,
+        appointments: state.appointments,
+        interviewers: state.interviewers
+      })
+    })
   };
 
   return { state, setDay, bookInterview, deleteInterview }
