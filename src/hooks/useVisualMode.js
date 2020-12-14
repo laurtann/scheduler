@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function useVisualMode(initial) {
+
   const [mode, setMode] = useState(initial);
   const [history, setHistory] = useState([initial]);
 
@@ -15,8 +16,6 @@ export default function useVisualMode(initial) {
 
   function back() {
     if (history.length > 1) {
-      // lifecycle hasn't caught up yet, so history has changed but mode still thinks
-      // the item we just sliced is there --- not async
       setHistory(prev => [...prev.slice(0, prev.length -1)]);
       setMode(history[history.length - 2]);
     }
