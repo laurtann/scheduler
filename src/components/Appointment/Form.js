@@ -6,6 +6,15 @@ export default function Form(props) {
   const [name, setName] = useState(props.name || "");
   const [interviewer, setInterviewer] = useState(props.interviewer || null);
   const changeSpots = props.changeSpots || null;
+  const [err, toggleErr] = useState(false);
+  const handleSave = () => {
+    if (name && interviewer) {
+      props.onSave(name, interviewer, changeSpots);
+      toggleErr(false);
+    } else {
+      toggleErr(true);
+    }
+  }
 
   const reset = () => {
     setName("");
@@ -28,8 +37,11 @@ export default function Form(props) {
             type="text"
             value={name}
             placeholder="Enter Student Name"
+            data-testid="student-name-input"
           />
         </form>
+        { err && !name && <h3 style={{color: "red"}}>Student name cannot be blank</h3> }
+        { err && !interviewer && <h3 style={{color: "red"}}>Please choose an interviewer</h3> }
         <InterviewerList
           interviewers={props.interviewers}
           interviewer={interviewer}
@@ -39,7 +51,7 @@ export default function Form(props) {
       <section className="appointment__card-right">
         <section className="appointment__actions">
           <Button onClick={cancel} danger>Cancel</Button>
-          <Button onClick={() => props.onSave(name, interviewer, changeSpots)} confirm>Save</Button>
+          <Button onClick={handleSave} confirm>Save</Button>
         </section>
       </section>
     </main>
