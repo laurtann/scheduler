@@ -6,7 +6,8 @@ export default function useApplicationData() {
   const SET_DAY = "SET_DAY";
   const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
   const SET_INTERVIEW = "SET_INTERVIEW";
-  const WS_INTERVIEW = "WS_INTERVIEW";
+  const BOOK_INTERVIEW = "BOOK_INTERVIEW";
+  const DELETE_INTERVIEW = "DELETE_INTERVIEW";
 
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
@@ -17,15 +18,33 @@ export default function useApplicationData() {
 
   function reducer(state, action) {
     if (action.type === SET_DAY) {
-      return {...state, day: action.day}
+      return {
+        ...state,
+        day: action.day
+      }
     }
     if (action.type === SET_APPLICATION_DATA) {
-      return {...state, days: action.days, appointments: action.appointments, interviewers: action.interviewers}
+      return {
+        ...state,
+        days: action.days,
+        appointments: action.appointments,
+        interviewers: action.interviewers
+      }
+    }
+    if (action.type === BOOK_INTERVIEW) {
+      return {
+        ...state,
+        appointments: action.appointments,
+        interview: action.interview
+      }
+    }
+    if (action.type === DELETE_INTERVIEW) {
+      return {
+        ...state,
+        interview: action.interview
+      }
     }
     if (action.type === SET_INTERVIEW) {
-      return {...state, appointments: action.appointments, interview: action.interview }
-    }
-    if (action.type === WS_INTERVIEW) {
       const appointment = {
         ...state.appointments[action.id],
         interview: {...action.interview }
@@ -35,7 +54,12 @@ export default function useApplicationData() {
         ...state.appointments,
         [action.id]: appointment
       };
-      return {...state, appointments: appointments, interview: action.interview }
+
+      return {
+        ...state,
+        appointments: appointments,
+        interview: action.interview
+      }
     }
     throw new Error(
       `Tried to reduce with unsupported action type: ${action.type}`
@@ -71,10 +95,13 @@ export default function useApplicationData() {
     //message from server
     ws.onmessage = function (event) {
       const message = JSON.parse(event.data);
-      console.log(message);
 
       if (message.type === "SET_INTERVIEW") {
-        dispatch({type: WS_INTERVIEW, id: message.id, interview: message.interview})
+        dispatch({
+          type: SET_INTERVIEW,
+          id: message.id,
+          interview: message.interview
+        })
       }
     }
     // close connection
@@ -107,16 +134,15 @@ export default function useApplicationData() {
         [id]: appointment
       };
 
-      dispatch({ type: SET_INTERVIEW,
+      dispatch({
+        type: BOOK_INTERVIEW,
         appointments,
         interview: response.data
       });
-    })
+    });
   };
 
   function deleteInterview(id, interview) {
-    // add in to satisfy reducer
-    const appointments = state.appointments;
 
     // update spots
     for (let day of [...state.days]) {
@@ -128,9 +154,8 @@ export default function useApplicationData() {
     return axios.delete(`/api/appointments/${id}`)
     .then(response =>
       dispatch({
-        type: SET_INTERVIEW,
+        type: DELETE_INTERVIEW,
         interview: null,
-        appointments
       })
     )
   };
