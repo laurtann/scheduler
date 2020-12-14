@@ -8,6 +8,7 @@ export default function useApplicationData() {
   const SET_INTERVIEW = "SET_INTERVIEW";
   const BOOK_INTERVIEW = "BOOK_INTERVIEW";
   const DELETE_INTERVIEW = "DELETE_INTERVIEW";
+  const SET_DAYS_DATA = "SET_DAYS_DATA";
 
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
@@ -31,36 +32,55 @@ export default function useApplicationData() {
         interviewers: action.interviewers
       }
     }
-    if (action.type === BOOK_INTERVIEW) {
+    if (action.type === SET_DAYS_DATA) {
       return {
         ...state,
-        appointments: action.appointments,
-        interview: action.interview
+        days: action.days,
       }
     }
-    if (action.type === DELETE_INTERVIEW) {
-      return {
-        ...state,
-        interview: action.interview
-      }
-    }
-    if (action.type === SET_INTERVIEW) {
+    if (action.type === BOOK_INTERVIEW || action.type === DELETE_INTERVIEW || action.type === SET_INTERVIEW) {
+      // console.log("ACTION", action);
       const appointment = {
-        ...state.appointments[action.id],
-        interview: {...action.interview }
+        ...state.appointments[action.appointmentId],
+        interview: action.interview ? {...action.interview } : null
       };
 
       const appointments = {
         ...state.appointments,
-        [action.id]: appointment
+        [action.appointmentId]: appointment
       };
+
+      refreshDaysData();
+
 
       return {
         ...state,
-        appointments: appointments,
-        interview: action.interview
+        appointments,
       }
     }
+    // if (action.type === DELETE_INTERVIEW) {
+    //   return {
+    //     ...state,
+    //     interview: action.interview
+    //   }
+    // }
+    // if (action.type === SET_INTERVIEW) {
+    //   const appointment = {
+    //     ...state.appointments[action.id],
+    //     interview: {...action.interview }
+    //   };
+
+      // const appointments = {
+      //   ...state.appointments,
+      //   [action.id]: appointment
+      // };
+
+      // return {
+      //   ...state,
+      //   appointments: appointments,
+      //   interview: action.interview
+    //   // }
+    // }
     throw new Error(
       `Tried to reduce with unsupported action type: ${action.type}`
     );
@@ -85,8 +105,10 @@ export default function useApplicationData() {
       });
     })
     .catch(error => console.log(error));
+  }, []);
 
-    // WEBSOCKETS IP
+  useEffect(() => {
+    // WebSocket Connection
     const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
     // message to server
     ws.onopen = function (event) {
@@ -99,7 +121,7 @@ export default function useApplicationData() {
       if (message.type === "SET_INTERVIEW") {
         dispatch({
           type: SET_INTERVIEW,
-          id: message.id,
+          appointmentId: message.id,
           interview: message.interview
         })
       }
@@ -108,40 +130,19 @@ export default function useApplicationData() {
     return function cleanup() {
       ws.close();
     }
-  }, [state.days]);
+  }, []);
 
-  function bookInterview(id, interview, changeSpots) {
+  function bookInterview(id, interview) {
 
     // add interview info to db
     return axios.put(`/api/appointments/${id}`, { interview })
     .then(response => {
 
-      const appointment = {
-        ...state.appointments[id],
-        interview: {...interview }
-      };
-
-      const appointments = {
-        ...state.appointments,
-        [id]: appointment
-      };
-
       dispatch({
         type: BOOK_INTERVIEW,
-        appointments,
-        interview: response.data
+        interview,
+        appointmentId: id
       });
-    })
-    .then(() => {
-      return axios.get(`/api/days`)
-    })
-    .then(res => {
-      dispatch({
-        type: SET_APPLICATION_DATA,
-        days: res.data,
-        appointments: state.appointments,
-        interviewers: state.interviewers
-      })
     })
   };
 
@@ -152,20 +153,20 @@ export default function useApplicationData() {
       dispatch({
         type: DELETE_INTERVIEW,
         interview: null,
+        appointmentId: id
       })
     )
-    .then(() => {
-      return axios.get(`/api/days`)
-    })
-    .then(res => {
+  };
+
+  function refreshDaysData() {
+    axios.get(`/api/days`)
+    .then(response => {
       dispatch({
-        type: SET_APPLICATION_DATA,
-        days: res.data,
-        appointments: state.appointments,
-        interviewers: state.interviewers
+        type: SET_DAYS_DATA,
+        days: response.data,
       })
     })
-  };
+  }
 
   return { state, setDay, bookInterview, deleteInterview }
 }
