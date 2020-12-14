@@ -7,6 +7,7 @@ function getAppointmentsForDay (state, day) {
   return appointments;
 }
 
+// returns interview object
 function getInterview (state, interview) {
   let interviewObj = {};
 
@@ -14,23 +15,22 @@ function getInterview (state, interview) {
     return null;
   }
 
-  const interviewerId = interview.interviewer
+  const interviewerId = interview.interviewer;
 
   if (state.interviewers[interviewerId]) {
     interviewObj.student = interview.student;
-    interviewObj.interviewer = state.interviewers[interviewerId]
+    interviewObj.interviewer = state.interviewers[interviewerId];
     return interviewObj;
   }
   return null;
 };
 
-function getInterviewersForDay (state, day){
+function getInterviewersForDay (state, day) {
   const dayFound = state.days.find(currentDay => currentDay.name === day);
   if (!dayFound) {
     return [];
   }
   const interviewers = dayFound.interviewers.map(interviewerId => state.interviewers[interviewerId]);
-  // console.log(interviewers);
   return interviewers;
 }
 

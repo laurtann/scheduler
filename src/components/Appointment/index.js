@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import './styles.scss';
 import Header from './Header';
 import Show from './Show';
@@ -25,13 +25,14 @@ export default function Appointment(props) {
   );
 
   //save appt to db
-  function save(name, interviewer) {
+  //only change spots in create mode
+  function save(name, interviewer, changeSpots) {
     const interview = {
       student: name,
       interviewer
     };
     transition(SAVING);
-    props.bookInterview(props.id, interview)
+    props.bookInterview(props.id, interview, changeSpots)
     .then(() => transition(SHOW))
     .catch(error => transition(ERROR_SAVE, true));
   }
@@ -44,15 +45,14 @@ export default function Appointment(props) {
     .catch(error => transition(ERROR_DELETE, true));
   }
 
-  // helper to transition to confirm deletion when form delete btn pressed
-  function pressDelete() {
-    transition(CONFIRM);
-  }
-
-  //edit appointment info
-  function editAppointment() {
-    transition(EDIT);
-  }
+  useEffect(() => {
+    if (props.interview && mode === EMPTY) {
+      transition(SHOW);
+    }
+    if (props.interview === null && mode === SHOW) {
+      transition(EMPTY);
+    }
+  }, [props.interview, transition, mode]);
 
   return (
     <article className="appointment">
@@ -60,13 +60,12 @@ export default function Appointment(props) {
         time={props.time}
       />
       {mode === EMPTY && <Empty onAdd={() => transition(CREATE)} />}
-      {mode === SHOW && (
+      {mode === SHOW && props.interview && (
         <Show
-          // these are coming from appointment props
           student={props.interview.student}
           interviewer={props.interview.interviewer}
-          onDelete={pressDelete}
-          onEdit={editAppointment}
+          onDelete={() => transition(CONFIRM)}
+          onEdit={() => transition(EDIT)}
         />
       )}
       {mode === CREATE && (
@@ -74,6 +73,7 @@ export default function Appointment(props) {
           interviewers={props.interviewers}
           onSave={save}
           onCancel={back}
+          changeSpots={true}
         />
       )}
       {mode === EDIT && (
@@ -102,7 +102,7 @@ export default function Appointment(props) {
           message="Deleting"
         />
       )}
-      {mode === ERROR_SAVE&& (
+      {mode === ERROR_SAVE && (
         <Error
           message="Error while Saving"
           onClose={back}
