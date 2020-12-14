@@ -17,10 +17,13 @@ function getInterview (state, interview) {
 
   const interviewerId = interview.interviewer;
 
+
   if (state.interviewers[interviewerId]) {
     interviewObj.student = interview.student;
     interviewObj.interviewer = state.interviewers[interviewerId];
     return interviewObj;
+  } else {
+    console.error(`Interview ${JSON.stringify(interview)} is not found`);
   }
   return null;
 };
