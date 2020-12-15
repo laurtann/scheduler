@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Button from "components/Button";
-import InterviewerList from "components/InterviewerList"
+import InterviewerList from "components/InterviewerList";
 
 export default function Form(props) {
   // initialize state
@@ -10,13 +10,13 @@ export default function Form(props) {
   // validate student name/interviewer is truthy
   const validate = () => {
     if (name) {
-      setError("")
+      setError("");
       props.onSave(name, interviewer);
     } else {
       setError("Student name cannot be blank");
       return;
     }
-  }
+  };
 
   // const validate = () => {
   //   if (name && interviewer) {
@@ -35,15 +35,15 @@ export default function Form(props) {
   const reset = () => {
     setName("");
     setInterviewer(null);
-  }
+  };
 
   // cancel new interview
   const cancel = () => {
     reset();
     props.onCancel();
-  }
+  };
 
-  return(
+  return (
     <main className="appointment__card appointment__card--create">
       <section className="appointment__card-left">
         <form autoComplete="off" onSubmit={event => event.preventDefault()}>

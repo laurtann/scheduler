@@ -24,7 +24,7 @@ function getInterview (state, interview) {
     return interviewObj;
   }
   return null;
-};
+}
 
 // returns array of interviewers for the day
 function getInterviewersForDay (state, day) {
