@@ -88,8 +88,8 @@ export default function useApplicationData() {
     .catch(error => console.log(error));
   }, []);
 
+  // WebSocket Connection
   useEffect(() => {
-    // WebSocket Connection
     const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
     // test message to server
     ws.onopen = function (event) {
