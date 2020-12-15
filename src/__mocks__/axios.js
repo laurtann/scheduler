@@ -54,6 +54,7 @@ const fixtures = {
 };
 
 // allows update of spots - adapted from https://jestjs.io/docs/en/manual-mocks
+// first time, return fixtures. second, returns __setDaysFixture
 function __setDaysFixture(days) {
   fixtures.days = days;
 }
@@ -62,7 +63,6 @@ module.exports = {
   __setDaysFixture,
   get: jest.fn(url => {
     if (url === "/api/days") {
-      console.log(fixtures.days);
       return Promise.resolve({
         status: 200,
         statusText: "OK",
