@@ -10,6 +10,7 @@ export default function useApplicationData() {
   const DELETE_INTERVIEW = "DELETE_INTERVIEW";
   const SET_DAYS_DATA = "SET_DAYS_DATA";
 
+  // initialize reducer
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
@@ -24,6 +25,7 @@ export default function useApplicationData() {
         day: action.day
       }
     }
+    // update state from days/appts/interviewers get req
     if (action.type === SET_APPLICATION_DATA) {
       return {
         ...state,
@@ -32,14 +34,15 @@ export default function useApplicationData() {
         interviewers: action.interviewers
       }
     }
+    // update state for spots
     if (action.type === SET_DAYS_DATA) {
       return {
         ...state,
         days: action.days,
       }
     }
+    // update state for appt handling
     if (action.type === BOOK_INTERVIEW || action.type === DELETE_INTERVIEW || action.type === SET_INTERVIEW) {
-      // console.log("ACTION", action);
       const appointment = {
         ...state.appointments[action.appointmentId],
         interview: action.interview ? {...action.interview } : null
@@ -50,37 +53,15 @@ export default function useApplicationData() {
         [action.appointmentId]: appointment
       };
 
+      // function to update spots
       refreshDaysData();
-
 
       return {
         ...state,
         appointments,
       }
     }
-    // if (action.type === DELETE_INTERVIEW) {
-    //   return {
-    //     ...state,
-    //     interview: action.interview
-    //   }
-    // }
-    // if (action.type === SET_INTERVIEW) {
-    //   const appointment = {
-    //     ...state.appointments[action.id],
-    //     interview: {...action.interview }
-    //   };
 
-      // const appointments = {
-      //   ...state.appointments,
-      //   [action.id]: appointment
-      // };
-
-      // return {
-      //   ...state,
-      //   appointments: appointments,
-      //   interview: action.interview
-    //   // }
-    // }
     throw new Error(
       `Tried to reduce with unsupported action type: ${action.type}`
     );
@@ -88,7 +69,7 @@ export default function useApplicationData() {
 
   const setDay = day => dispatch({ type: SET_DAY, day });
 
-  // request all APIs
+  // get request days/appts/interviewers DB
   useEffect(() => {
     Promise.all([
       axios.get(`/api/days`),
@@ -110,11 +91,11 @@ export default function useApplicationData() {
   useEffect(() => {
     // WebSocket Connection
     const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-    // message to server
+    // test message to server
     ws.onopen = function (event) {
       ws.send("ping");
     };
-    //message from server
+    // message from server containing interview object
     ws.onmessage = function (event) {
       const message = JSON.parse(event.data);
 
@@ -132,32 +113,10 @@ export default function useApplicationData() {
     }
   }, []);
 
-  function bookInterview(id, interview) {
-
-    // add interview info to db
-    return axios.put(`/api/appointments/${id}`, { interview })
-    .then(response => {
-
-      dispatch({
-        type: BOOK_INTERVIEW,
-        interview,
-        appointmentId: id
-      });
-    })
-  };
-
-  function deleteInterview(id, interview) {
-
-    return axios.delete(`/api/appointments/${id}`)
-    .then(response =>
-      dispatch({
-        type: DELETE_INTERVIEW,
-        interview: null,
-        appointmentId: id
-      })
-    )
-  };
-
+  // if need to change spots in future, do it here
+  // recalc spots - go to each day and calc how many days null
+  // do it without mutating state
+  // function to update spots
   function refreshDaysData() {
     axios.get(`/api/days`)
     .then(response => {
@@ -167,6 +126,30 @@ export default function useApplicationData() {
       })
     })
   }
+
+  function bookInterview(id, interview) {
+    // add interview info to db
+    return axios.put(`/api/appointments/${id}`, { interview })
+    .then(response => {
+      dispatch({
+        type: BOOK_INTERVIEW,
+        interview,
+        appointmentId: id
+      });
+    })
+  };
+
+  function deleteInterview(id, interview) {
+    // remove interview from db
+    return axios.delete(`/api/appointments/${id}`)
+    .then(response =>
+      dispatch({
+        type: DELETE_INTERVIEW,
+        interview: null,
+        appointmentId: id
+      })
+    )
+  };
 
   return { state, setDay, bookInterview, deleteInterview }
 }
