@@ -6,6 +6,7 @@ import useApplicationData from 'hooks/useApplicationData';
 import { getAppointmentsForDay, getInterview, getInterviewersForDay } from '../helpers/selectors'
 
 export default function Application(props) {
+  // methods from useApplicationData hook
   const {
     state,
     setDay,
@@ -13,7 +14,7 @@ export default function Application(props) {
     deleteInterview
   } = useApplicationData();
 
-  // helpers
+  // selectors
   const dailyAppointments = getAppointmentsForDay(state, state.day);
   const dailyInterviewers = getInterviewersForDay(state, state.day);
 

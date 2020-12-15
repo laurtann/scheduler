@@ -9,6 +9,7 @@ import Confirm from './Confirm';
 import Error from './Error';
 import useVisualMode from '../../../src/hooks/useVisualMode';
 
+// Vars to conditionally render components
 const EMPTY = "EMPTY";
 const SHOW = "SHOW";
 const CREATE = "CREATE";
@@ -20,24 +21,24 @@ const ERROR_SAVE = "ERROR_SAVE";
 const ERROR_DELETE = "ERROR_DELETE"
 
 export default function Appointment(props) {
+  // handle rendering of show/empty components
   const { mode, transition, back } = useVisualMode(
     props.interview ? SHOW : EMPTY
   );
 
-  //save appt to db
-  //only change spots in create mode
-  function save(name, interviewer, changeSpots) {
+  // handle interview save & pass bookInterview info to add to db
+  function save(name, interviewer) {
     const interview = {
       student: name,
       interviewer
     };
     transition(SAVING);
-    props.bookInterview(props.id, interview, changeSpots)
+    props.bookInterview(props.id, interview)
     .then(() => transition(SHOW))
     .catch(error => transition(ERROR_SAVE, true));
   }
 
-  // function to cancel appt & delete from db
+  // cancel appt & pass deleteInterview info to delete from db
   function cancelAppointment (name, interview) {
     transition(DELETING, true)
     props.deleteInterview(props.id, interview)
@@ -45,6 +46,7 @@ export default function Appointment(props) {
     .catch(error => transition(ERROR_DELETE, true));
   }
 
+  // handle transition of show/empty components based on interview obj
   useEffect(() => {
     if (props.interview && mode === EMPTY) {
       transition(SHOW);

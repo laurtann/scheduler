@@ -3,9 +3,11 @@ import Button from "components/Button";
 import InterviewerList from "components/InterviewerList"
 
 export default function Form(props) {
+  // initialize state
   const [name, setName] = useState(props.name || "");
   const [interviewer, setInterviewer] = useState(props.interviewer || null);
   const [error, setError] = useState("");
+  // validate student name/interviewer is truthy
   const validate = () => {
     if (name) {
       setError("")
@@ -29,11 +31,13 @@ export default function Form(props) {
   //   }
   // }
 
+  // reset form
   const reset = () => {
     setName("");
     setInterviewer(null);
   }
 
+  // cancel new interview
   const cancel = () => {
     reset();
     props.onCancel();
