@@ -1,6 +1,7 @@
 import React from "react";
-import { render, cleanup, waitForElement, fireEvent, getByText, prettyDOM, getAllByTestId, getByAltText, getByPlaceholderText } from "@testing-library/react";
+import { render, cleanup, waitForElement, fireEvent, getByText, prettyDOM, getAllByTestId, getByAltText, getByPlaceholderText, queryByText } from "@testing-library/react";
 import Application from "components/Application";
+jest.mock('axios');
 
 afterEach(cleanup);
 describe("Application", () => {
@@ -13,6 +14,22 @@ describe("Application", () => {
   });
 
   it("loads data, books an interview and reduces the spots remaining for Monday by 1", async () => {
+    require('axios').__setDaysFixture([
+      {
+        id: 1,
+        name: "Monday",
+        appointments: [1, 2],
+        interviewers: [1, 2],
+        spots: 0
+      },
+      {
+        id: 2,
+        name: "Tuesday",
+        appointments: [3, 4],
+        interviewers: [3, 4],
+        spots: 1
+      }
+    ]);
     const { container, debug } = render(<Application />);
 
     await waitForElement(() => getByText(container, "Archie Cohen"));
@@ -25,15 +42,18 @@ describe("Application", () => {
     fireEvent.change(getByPlaceholderText(appointment, /enter student name/i), {
       target: { value: "Lydia Miller-Jones" }
     });
+
     fireEvent.click(getByAltText(appointment, "Sylvia Palmer"));
-
     fireEvent.click(getByText(appointment, "Save"));
-    // doesn't work because of websockets
-    // await waitForElement(() => getByText(appointment, "Lydia Miller-Jones"));
 
-    // debug();
     expect(getByText(appointment, "Saving")).toBeInTheDocument();
 
-    // console.log(prettyDOM(appointment));
+    await waitForElement(() => getByText(appointment, "Lydia Miller-Jones"));
+
+    const day = getAllByTestId(container, "day").find(day =>
+      queryByText(day, "Monday")
+    );
+
+    expect(getByText(day, "no spots remaining")).toBeInTheDocument();
   });
 });

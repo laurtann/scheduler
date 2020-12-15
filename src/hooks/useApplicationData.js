@@ -125,7 +125,7 @@ export default function useApplicationData() {
           days: response.data,
         });
       });
-  }
+  };
 
   function bookInterview(id, interview) {
     // add interview info to db
