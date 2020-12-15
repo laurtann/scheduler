@@ -8,7 +8,9 @@ export default function useApplicationData() {
   const SET_INTERVIEW = "SET_INTERVIEW";
   const BOOK_INTERVIEW = "BOOK_INTERVIEW";
   const DELETE_INTERVIEW = "DELETE_INTERVIEW";
+  const SET_DAYS_DATA = "SET_DAYS_DATA";
 
+  // initialize reducer
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
@@ -21,46 +23,45 @@ export default function useApplicationData() {
       return {
         ...state,
         day: action.day
-      }
+      };
     }
+    // update state from days/appts/interviewers get req
     if (action.type === SET_APPLICATION_DATA) {
       return {
         ...state,
         days: action.days,
         appointments: action.appointments,
         interviewers: action.interviewers
-      }
+      };
     }
-    if (action.type === BOOK_INTERVIEW) {
+    // update state for spots
+    if (action.type === SET_DAYS_DATA) {
       return {
         ...state,
-        appointments: action.appointments,
-        interview: action.interview
-      }
+        days: action.days,
+      };
     }
-    if (action.type === DELETE_INTERVIEW) {
-      return {
-        ...state,
-        interview: action.interview
-      }
-    }
-    if (action.type === SET_INTERVIEW) {
+    // update state for appt handling
+    if (action.type === BOOK_INTERVIEW || action.type === DELETE_INTERVIEW || action.type === SET_INTERVIEW) {
       const appointment = {
-        ...state.appointments[action.id],
-        interview: {...action.interview }
+        ...state.appointments[action.appointmentId],
+        interview: action.interview ? {...action.interview } : null
       };
 
       const appointments = {
         ...state.appointments,
-        [action.id]: appointment
+        [action.appointmentId]: appointment
       };
+
+      // function to update spots
+      refreshDaysData();
 
       return {
         ...state,
-        appointments: appointments,
-        interview: action.interview
-      }
+        appointments,
+      };
     }
+
     throw new Error(
       `Tried to reduce with unsupported action type: ${action.type}`
     );
@@ -68,97 +69,87 @@ export default function useApplicationData() {
 
   const setDay = day => dispatch({ type: SET_DAY, day });
 
-  // request all APIs
+  // get request days/appts/interviewers DB
   useEffect(() => {
     Promise.all([
       axios.get(`/api/days`),
       axios.get(`/api/appointments`),
       axios.get(`/api/interviewers`)
     ])
-    .then(([days, appointments, interviewers]) => {
+      .then(([days, appointments, interviewers]) => {
       // console.log("DAYS", days.data, "APPTS", appointments.data, "INTS", interviewers.data);
-      dispatch({
-        type: SET_APPLICATION_DATA,
-        days: days.data,
-        appointments: appointments.data,
-        interviewers: interviewers.data
-      });
-    })
-    .catch(error => console.log(error));
+        dispatch({
+          type: SET_APPLICATION_DATA,
+          days: days.data,
+          appointments: appointments.data,
+          interviewers: interviewers.data
+        });
+      })
+      .catch(error => console.log(error));
+  }, []);
 
-    // WEBSOCKETS IP
+  // WebSocket Connection
+  useEffect(() => {
     const ws = new WebSocket(process.env.REACT_APP_WEBSOCKET_URL);
-    // message to server
+    // test message to server
     ws.onopen = function (event) {
       ws.send("ping");
     };
-    //message from server
+    // message from server containing interview object
     ws.onmessage = function (event) {
       const message = JSON.parse(event.data);
 
       if (message.type === "SET_INTERVIEW") {
         dispatch({
           type: SET_INTERVIEW,
-          id: message.id,
+          appointmentId: message.id,
           interview: message.interview
-        })
+        });
       }
-    }
+    };
     // close connection
     return function cleanup() {
       ws.close();
-    }
-  }, [state.interview]);
-
-  function bookInterview(id, interview, changeSpots) {
-    //update spots
-    if (changeSpots) {
-      for (let day of [...state.days]) {
-        if (day.appointments.includes(id)) {
-          day.spots -= 1;
-        }
-      }
     };
+  }, []);
 
+  // if need to change spots in future, do it here
+  // recalc spots - go to each day and calc how many days null
+  // do it without mutating state
+  // function to update spots
+  function refreshDaysData() {
+    axios.get(`/api/days`)
+      .then(response => {
+        dispatch({
+          type: SET_DAYS_DATA,
+          days: response.data,
+        });
+      });
+  }
+
+  function bookInterview(id, interview) {
     // add interview info to db
     return axios.put(`/api/appointments/${id}`, { interview })
-    .then(response => {
-
-      const appointment = {
-        ...state.appointments[id],
-        interview: {...interview }
-      };
-
-      const appointments = {
-        ...state.appointments,
-        [id]: appointment
-      };
-
-      dispatch({
-        type: BOOK_INTERVIEW,
-        appointments,
-        interview: response.data
+      .then(response => {
+        dispatch({
+          type: BOOK_INTERVIEW,
+          interview,
+          appointmentId: id
+        });
       });
-    });
-  };
+  }
 
   function deleteInterview(id, interview) {
-
-    // update spots
-    for (let day of [...state.days]) {
-      if (day.appointments.includes(id)) {
-        day.spots += 1
-      }
-    };
-
+    // remove interview from db
     return axios.delete(`/api/appointments/${id}`)
-    .then(response =>
-      dispatch({
-        type: DELETE_INTERVIEW,
-        interview: null,
-      })
-    )
-  };
+      .then(response =>
+        dispatch({
+          type: DELETE_INTERVIEW,
+          interview: null,
+          appointmentId: id
+        })
+      );
+  }
 
-  return { state, setDay, bookInterview, deleteInterview }
+  return { state, setDay, bookInterview, deleteInterview };
 }

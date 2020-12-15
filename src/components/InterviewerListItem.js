@@ -3,6 +3,7 @@ import './InterviewerListItem.scss';
 import classNames from 'classnames';
 
 export default function InterviewerListItem(props) {
+  // conditionally add styling to interviewListItem
   const interviewListItemClass = classNames('interviewers__item', {
     'interviewers__item--selected': props.selected
   });
