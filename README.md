@@ -15,6 +15,8 @@ This app was built using React, Webpack, Babel, Axios and WebSockets. It was tes
 
 Install dependencies with `npm install`.
 
+Uses database information from https://github.com/laurtann/scheduler-api. Server must be running using npm start. 
+
 ## Running Webpack Development Server
 
 ```sh
