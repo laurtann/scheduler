@@ -4,13 +4,12 @@ import axios from 'axios';
 import getReducer, { SET_DAY, SET_APPLICATION_DATA, SET_INTERVIEW, BOOK_INTERVIEW, DELETE_INTERVIEW, SET_DAYS_DATA } from "../reducers/application"
 
 export default function useApplicationData() {
-
-  // initialize reducer
+  // initialize reducer & pass in refreshDaysData to getReducer from application
   const [state, dispatch] = useReducer(getReducer(refreshDaysData), {
     day: "Monday",
     days: [],
     appointments: {},
-    interviewers: {},
+    interviewers: {}
   });
 
   const setDay = day => dispatch({ type: SET_DAY, day });
@@ -59,9 +58,6 @@ export default function useApplicationData() {
     };
   }, []);
 
-  // if need to change spots in future, do it here
-  // recalc spots - go to each day and calc how many days null
-  // do it without mutating state
   // function to update spots
   function refreshDaysData() {
     axios.get(`/api/days`)

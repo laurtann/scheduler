@@ -6,6 +6,7 @@ export const BOOK_INTERVIEW = "BOOK_INTERVIEW";
 export const DELETE_INTERVIEW = "DELETE_INTERVIEW";
 export const SET_DAYS_DATA = "SET_DAYS_DATA";
 
+// pass refreshDaysData func as param to deal w my unpure reducer
 export default function getReducer (refreshDaysData) {
   function reducer(state, action) {
     if (action.type === SET_DAY) {
