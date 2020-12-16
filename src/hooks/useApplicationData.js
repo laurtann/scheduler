@@ -1,71 +1,17 @@
 import { useReducer, useEffect } from "react";
 import axios from 'axios';
 
+import getReducer, { SET_DAY, SET_APPLICATION_DATA, SET_INTERVIEW, BOOK_INTERVIEW, DELETE_INTERVIEW, SET_DAYS_DATA } from "../reducers/application"
+
 export default function useApplicationData() {
-  // consts for reducer
-  const SET_DAY = "SET_DAY";
-  const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
-  const SET_INTERVIEW = "SET_INTERVIEW";
-  const BOOK_INTERVIEW = "BOOK_INTERVIEW";
-  const DELETE_INTERVIEW = "DELETE_INTERVIEW";
-  const SET_DAYS_DATA = "SET_DAYS_DATA";
 
   // initialize reducer
-  const [state, dispatch] = useReducer(reducer, {
+  const [state, dispatch] = useReducer(getReducer(refreshDaysData), {
     day: "Monday",
     days: [],
     appointments: {},
     interviewers: {},
   });
-
-  function reducer(state, action) {
-    if (action.type === SET_DAY) {
-      return {
-        ...state,
-        day: action.day
-      };
-    }
-    // update state from days/appts/interviewers get req
-    if (action.type === SET_APPLICATION_DATA) {
-      return {
-        ...state,
-        days: action.days,
-        appointments: action.appointments,
-        interviewers: action.interviewers
-      };
-    }
-    // update state for spots
-    if (action.type === SET_DAYS_DATA) {
-      return {
-        ...state,
-        days: action.days,
-      };
-    }
-    // update state for appt handling
-    if (action.type === BOOK_INTERVIEW || action.type === DELETE_INTERVIEW || action.type === SET_INTERVIEW) {
-      const appointment = {
-        ...state.appointments[action.appointmentId],
-        interview: action.interview ? {...action.interview } : null
-      };
-
-      const appointments = {
-        ...state.appointments,
-        [action.appointmentId]: appointment
-      };
-
-      // function to update spots
-      refreshDaysData();
-
-      return {
-        ...state,
-        appointments,
-      };
-    }
-
-    throw new Error(
-      `Tried to reduce with unsupported action type: ${action.type}`
-    );
-  }
 
   const setDay = day => dispatch({ type: SET_DAY, day });
 
