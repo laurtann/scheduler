@@ -22,7 +22,6 @@ export default function useApplicationData() {
       axios.get(`/api/interviewers`)
     ])
       .then(([days, appointments, interviewers]) => {
-      // console.log("DAYS", days.data, "APPTS", appointments.data, "INTS", interviewers.data);
         dispatch({
           type: SET_APPLICATION_DATA,
           days: days.data,
@@ -79,7 +78,7 @@ export default function useApplicationData() {
           appointmentId: id
         });
       });
-  }
+  };
 
   function deleteInterview(id, interview) {
     // remove interview from db
@@ -91,7 +90,7 @@ export default function useApplicationData() {
           appointmentId: id
         })
       );
-  }
+  };
 
   return { state, setDay, bookInterview, deleteInterview };
 }
