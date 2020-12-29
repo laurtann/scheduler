@@ -1,7 +1,7 @@
 # Interview Scheduler
 
 ### Scheduler is Live [Here](https://scheduler-laurtann.netlify.app/)!
-Refresh a few times, API (Heroku) can have a bit of a lag)
+Refresh a few times, API (Heroku) can have a bit of a lag.
 
 Scheduler is a single page app designed for students to book an interview with an instructor.
 
