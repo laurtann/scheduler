@@ -1,6 +1,6 @@
 # Interview Scheduler
 
-Scheduler is a single page app designed for students to book an interview with an instructor.
+Scheduler is a single page app designed for students to book an interview with an instructor. Users can create, edit and delete appointments, and receive an appropriate message if an error occurs.
 
 This app was built using React, Webpack, Babel, Axios and WebSockets. It was tested using Storybook, Jest, Webpack Dev Server and the React Testing Library. This project was created as part of Lighthouse Lab's Web Development Bootcamp over weeks 7 and 8.
 
@@ -15,7 +15,7 @@ This app was built using React, Webpack, Babel, Axios and WebSockets. It was tes
 
 Install dependencies with `npm install`.
 
-Uses database information from https://github.com/laurtann/scheduler-api. Server must be running using npm start. 
+Uses database information from https://github.com/laurtann/scheduler-api. Server must be running using npm start.
 
 ## Running Webpack Development Server
 
